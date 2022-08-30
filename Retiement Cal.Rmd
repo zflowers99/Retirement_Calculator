@@ -1,0 +1,74 @@
+---
+title: "Retirement Cal"
+author: "Zorian Flowers"
+date: "2022-08-29"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE,
+                      message = FALSE,
+                      warning = FALSE)
+```
+
+## Import Library
+
+```{r}
+library(tidyr)
+library(dplyr)
+
+# Ploting
+library(plotly)
+library(ggplot2)
+#library(gganimate)
+library(gifski)
+library(ggrepel)
+library(ggpubr)
+library(reshape2)
+```
+
+
+## Create Math Function
+
+```{r Math}
+
+
+table <- function(intin, age, inc = 60000, rr = 0.08, Rage = 59, invAmount = 0.05){
+  intR = intin * rr
+  finalReturn = 0
+  Yreturn = 0
+  ageMatrix <- c()
+  returnMatrix <- c()
+  while(Rage > age){
+    inc = inc + (inc * 0.02)
+    Yreturn = Yreturn + ( (inc * invAmount * rr) + 
+                            (intR * rr) + (inc * invAmount))
+    finalReturn =  finalReturn +Yreturn
+    age = age + 1
+    ageMatrix = c(ageMatrix, age)
+    returnMatrix = c(returnMatrix, finalReturn)
+    cat("At", age, "you will have", paste("$",formatC(finalReturn,
+                                           big.mark = ",", format = "f")), "\n")
+    
+  }
+  DF1 <- data.frame("Age" = ageMatrix, "AmountRetirment" = returnMatrix)
+  return(.GlobalEnv$RetirementTable <- DF1)
+  
+}
+
+```
+
+## Test Function
+```{r test}
+table(30000, 23, 100000)  
+```
+
+## Create Graph
+
+```{r}
+RetirementTable %>%
+  ggplot(aes(Age, AmountRetirment))+
+  geom_point()+
+  scale_y_continuous(labels = scales::dollar_format())
+```
+
